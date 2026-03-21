@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Event Management System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #060910;
+            --surface: #0d1117;
+            --surface2: #161b22;
+            --surface3: #21262d;
+            --border: #30363d;
+            --blue: #58a6ff;
+            --green: #3fb950;
+            --red: #f85149;
+            --purple: #d2a8ff;
+            --yellow: #e3b341;
+            --text: #e6edf3;
+            --muted: #8b949e;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        nav {
+            width: 100%;
+        }
+
+        /* NAV */
+        nav {
+            background: rgba(13, 17, 23, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links { display: flex; gap: 4px; }
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .nav-btn:hover { background: var(--surface3); color: var(--text); }
+        .nav-btn.active { background: var(--blue); color: #0d1117; font-weight: 600; }
+
+        /* HERO BANNER */
+        .hero {
+            background: linear-gradient(135deg, #0d1117 0%, #060910 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 48px 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px; left: 50%;
+            transform: translateX(-50%);
+            width: 600px; height: 300px;
+            background: radial-gradient(ellipse, #58a6ff15 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #e6edf3 0%, #58a6ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p { color: var(--muted); font-size: 15px; }
+
+        /* USER INFO BAR */
+        .user-bar {
+            background: #1a3a1a;
+            border-bottom: 1px solid #3fb95040;
+            padding: 10px 32px;
+            font-size: 13px;
+            color: var(--green);
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-bar span { font-weight: 600; }
+
+        /* PAGES */
+        .page { display: none; padding: 32px 16px; max-width: 960px; margin: 0 auto; }
+        .page.active { display: block; }
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 16px;
+            transition: border-color .2s;
+        }
+        .card:hover { border-color: #58a6ff40; }
+
+        /* FORMS */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { margin-bottom: 18px; }
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+        input, select, textarea {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border .2s, box-shadow .2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px #58a6ff20;
+        }
+        textarea { resize: vertical; min-height: 80px; }
+        select option { background: var(--surface2); }
+
+        /* BUTTONS */
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 11px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-full { width: 100%; justify-content: center; }
+        .btn-green { background: #238636; color: #fff; }
+        .btn-green:hover { background: #2ea043; transform: translateY(-1px); }
+        .btn-blue { background: #1f6feb; color: #fff; }
+        .btn-blue:hover { background: #388bfd; transform: translateY(-1px); }
+        .btn-red { background: #da363320; color: var(--red); border: 1px solid #da363340; }
+        .btn-red:hover { background: #da3633; color: #fff; }
+        .btn-outline { background: transparent; color: var(--blue); border: 1px solid var(--blue); }
+        .btn-outline:hover { background: var(--blue); color: #0d1117; }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
+
+        /* ALERT */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 14px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .alert.success {
+            background: #1a4a1a;
+            border: 1px solid #3fb95060;
+            color: var(--green);
+            display: flex;
+        }
+        .alert.error {
+            background: #4a1a1a;
+            border: 1px solid #f8514960;
+            color: var(--red);
+            display: flex;
+        }
+
+        /* EVENT CARDS */
+        .event-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            transition: border-color .2s, transform .2s;
+        }
+        .event-card:hover { border-color: #58a6ff40; transform: translateY(-2px); }
+        .event-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .event-card p { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+        .event-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+
+        /* TAGS */
+        .tag {
+            display: inline-block;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            margin-right: 4px;
+        }
+        .tag-blue { background: #1f6feb20; color: var(--blue); border: 1px solid #1f6feb40; }
+        .tag-green { background: #23863620; color: var(--green); border: 1px solid #23863640; }
+        .tag-purple { background: #d2a8ff20; color: var(--purple); border: 1px solid #d2a8ff40; }
+
+        /* CAPACITY BAR */
+        .capacity-bar {
+            background: var(--surface3);
+            border-radius: 20px;
+            height: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .capacity-fill {
+            height: 4px;
+            border-radius: 20px;
+            background: linear-gradient(90deg, var(--green), var(--blue));
+            transition: width .3s;
+        }
+
+        /* TABLE */
+        .table-wrap {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th {
+            background: var(--surface3);
+            padding: 12px 16px;
+            text-align: left;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+        td { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #ffffff05; }
+
+        /* STATS */
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-card .stat-num { font-size: 2rem; font-weight: 700; color: var(--blue); }
+        .stat-card .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+        /* EMPTY STATE */
+        .empty {
+            text-align: center;
+            padding: 48px;
+            color: var(--muted);
+        }
+        .empty .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+
+        @media(max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: 1fr; }
+            .event-card { flex-direction: column; }
+            nav { padding: 0 16px; }
+            .page { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <div class="nav-brand">🎓 Campus Events</div>
+    <div class="nav-links">
+        <button class="nav-btn active" onclick="showPage('register', this)">Register</button>
+        <button class="nav-btn" onclick="showPage('login', this)">Login</button>
+        <button class="nav-btn" onclick="showPage('events', this)">Events</button>
+        <button class="nav-btn" onclick="showPage('create', this)">Create Event</button>
+        <button class="nav-btn" onclick="showPage('participants', this)">Participants</button>
+    </div>
+</nav>
+
+
+<div class="user-bar" id="userBar">
+    ✅ Logged in as <span id="loggedInName"></span> · <span id="loggedInRole"></span>
+</div>
+
+<!-- PAGE: REGISTER -->
+<div class="page active" id="page-register">
+    <div class="page-title">📝 Create Account</div>
+    <div class="card" style="max-width:480px">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="reg-name" placeholder="Vishnu Mashalkar" />
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select id="reg-role">
+                    <option value="student">Student</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="reg-email" placeholder="vishnu@example.com" />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="reg-password" placeholder="Min 6 characters" />
+        </div>
+        <button class="btn btn-green btn-full" onclick="registerUser()">Create Account</button>
+        <div class="alert" id="reg-alert"></div>
+    </div>
+</div>
+
+<!-- PAGE: LOGIN -->
+<div class="page" id="page-login">
+    <div class="page-title">🔐 Login</div>
+    <div class="card" style="max-width:480px">
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="login-email" placeholder="vishnu@example.com" />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="Your password" />
+        </div>
+        <button class="btn btn-blue btn-full" onclick="loginUser()">Login</button>
+        <div class="alert" id="login-alert"></div>
+    </div>
+</div>
+
+<!-- PAGE: EVENTS -->
+<div class="page" id="page-events">
+    <div class="page-title">📅 All Events</div>
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-num" id="stat-events">0</div>
+            <div class="stat-label">Total Events</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" id="stat-capacity">0</div>
+            <div class="stat-label">Total Capacity</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" id="stat-organizers">0</div>
+            <div class="stat-label">Organizers</div>
+        </div>
+    </div>
+    <div id="events-list"></div>
+</div>
+
+<!-- PAGE: CREATE EVENT -->
+<div class="page" id="page-create">
+    <div class="page-title">➕ Create Event</div>
+    <div class="card" style="max-width:600px">
+        <div class="form-group">
+            <label>Event Title</label>
+            <input type="text" id="ev-title" placeholder="Tech Fest 2026" />
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="ev-desc" placeholder="Describe your event..."></textarea>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Date & Time</label>
+                <input type="datetime-local" id="ev-date" />
+            </div>
+            <div class="form-group">
+                <label>Max Participants</label>
+                <input type="number" id="ev-max" placeholder="50" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="ev-location" placeholder="BMS College, Bengaluru" />
+        </div>
+        <button class="btn btn-green btn-full" onclick="submitCreateEvent()">Create Event</button>
+        <div class="alert" id="create-alert"></div>
+    </div>
+</div>
+
+<!-- PAGE: PARTICIPANTS -->
+<div class="page" id="page-participants">
+    <div class="page-title">👥 Event Participants</div>
+    <div class="card" style="max-width:480px; margin-bottom:24px">
+        <div class="form-group" style="margin-bottom:0">
+            <label>Event ID</label>
+            <div style="display:flex; gap:10px; margin-top:6px">
+                <input type="number" id="part-event-id" placeholder="Enter event ID" />
+                <button class="btn btn-blue btn-sm" onclick="loadParticipants()">View</button>
+            </div>
+        </div>
+    </div>
+    <div id="participants-list"></div>
+</div>
+
+<script>
+    let currentUser = null;
+
+    function showPage(name, btn) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('page-' + name).classList.add('active');
+        btn.classList.add('active');
+        if (name === 'events') loadEvents();
+    }
+
+    function showAlert(id, message, type) {
+        const el = document.getElementById(id);
+        el.textContent = message;
+        el.className = 'alert ' + type;
+    }
+
+    async function registerUser() {
+        const name = document.getElementById('reg-name').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const role = document.getElementById('reg-role').value;
+        try {
+            const res = await fetch('/api/users/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password, role })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showAlert('reg-alert', '✅ Registered! You can now login.', 'success');
+            } else {
+                showAlert('reg-alert', '❌ ' + data.error, 'error');
+            }
+        } catch (e) {
+            showAlert('reg-alert', '❌ Could not connect to server.', 'error');
+        }
+    }
+
+    async function loginUser() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        try {
+            const res = await fetch('/api/users/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                currentUser = data;
+                document.getElementById('userBar').style.display = 'flex';
+                document.getElementById('loggedInName').textContent = data.name;
+                document.getElementById('loggedInRole').textContent = data.role;
+                showAlert('login-alert', '✅ Welcome back, ' + data.name + '!', 'success');
+            } else {
+                showAlert('login-alert', '❌ ' + data.error, 'error');
+            }
+        } catch (e) {
+            showAlert('login-alert', '❌ Could not connect to server.', 'error');
+        }
+    }
+
+    async function loadEvents() {
+        const res = await fetch('/api/events');
+        const events = await res.json();
+        const list = document.getElementById('events-list');
+
+        // Stats
+        document.getElementById('stat-events').textContent = events.length;
+        document.getElementById('stat-capacity').textContent = events.reduce((a, e) => a + e.maxParticipants, 0);
+        document.getElementById('stat-organizers').textContent = new Set(events.map(e => e.organizer.id)).size;
+
+        if (events.length === 0) {
+            list.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>No events yet. Create one!</p></div>';
+            return;
+        }
+
+        list.innerHTML = events.map(e => `
+            <div class="event-card">
+                <div style="flex:1">
+                    <span class="tag tag-blue">📍 ${e.location}</span>
+                    <span class="tag tag-purple">👤 ${e.organizer.name}</span>
+                    <h3>${e.title}</h3>
+                    <p style="margin-bottom:8px">${e.description || 'No description'}</p>
+                    <p>📅 ${new Date(e.eventDate).toLocaleString('en-IN', {dateStyle:'medium', timeStyle:'short'})}</p>
+                    <p>👥 Max ${e.maxParticipants} participants</p>
+                </div>
+                <div class="event-actions">
+                    <button class="btn btn-blue btn-sm" onclick="registerForEvent(${e.id})">Register</button>
+                    <button class="btn btn-red btn-sm" onclick="cancelRegistration(${e.id})">Cancel</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function registerForEvent(eventId) {
+        if (!currentUser) { alert('Please login first!'); return; }
+        const res = await fetch('/api/events/' + eventId + '/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser.id })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            alert('✅ Registered successfully!');
+        } else {
+            alert('❌ ' + data.error);
+        }
+    }
+
+    async function cancelRegistration(eventId) {
+        if (!currentUser) { alert('Please login first!'); return; }
+        const res = await fetch('/api/events/' + eventId + '/register', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser.id })
+        });
+        if (res.ok) alert('✅ Registration cancelled!');
+        else alert('❌ Could not cancel.');
+    }
+
+    async function submitCreateEvent() {
+        if (!currentUser) { alert('Please login first!'); return; }
+        const title = document.getElementById('ev-title').value;
+        const description = document.getElementById('ev-desc').value;
+        const eventDate = document.getElementById('ev-date').value;
+        const location = document.getElementById('ev-location').value;
+        const maxParticipants = document.getElementById('ev-max').value;
+        const res = await fetch('/api/events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title, description,
+                eventDate: eventDate + ':00',
+                location, maxParticipants,
+                organizerId: String(currentUser.id)
+            })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            showAlert('create-alert', '✅ Event created successfully!', 'success');
+        } else {
+            showAlert('create-alert', '❌ ' + data.error, 'error');
+        }
+    }
+
+    async function loadParticipants() {
+        const eventId = document.getElementById('part-event-id').value;
+        const res = await fetch('/api/events/' + eventId + '/participants');
+        const data = await res.json();
+        const list = document.getElementById('participants-list');
+        if (!data.length) {
+            list.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><p>No participants yet.</p></div>';
+            return;
+        }
+        list.innerHTML = `
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Registered At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map((r, i) => `
+                            <tr>
+                                <td style="color:var(--muted)">${i + 1}</td>
+                                <td style="font-weight:600">${r.user.name}</td>
+                                <td style="color:var(--muted)">${r.user.email}</td>
+                                <td><span class="tag tag-${r.user.role === 'admin' ? 'purple' : 'blue'}">${r.user.role}</span></td>
+                                <td style="color:var(--muted)">${new Date(r.registeredAt).toLocaleString('en-IN')}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+    }
+
+    window.onload = () => loadEvents();
+</script>
+</body>
+</html>
