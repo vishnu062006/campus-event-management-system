@@ -1,0 +1,64 @@
+package com.example.campus_events.controller;
+
+import com.example.campus_events.model.User;
+import com.example.campus_events.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+
+/**
+ * REST Controller for User endpoints
+ */
+@RestController
+@RequestMapping("/api/users")
+@CrossOrigin(origins = "*")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    /**
+     * POST /api/users/register
+     */
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
+        try {
+            String name = body.get("name");
+            String email = body.get("email");
+            String password = body.get("password");
+            String role = body.getOrDefault("role", "student");
+            User user = userService.register(name, email, password, role);
+            return ResponseEntity.status(201).body(user);
+        } catch (IllegalArgumentException e) {
+            System.out.println("[ERROR] Registration failed: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * POST /api/users/login
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
+        try {
+            String email = body.get("email");
+            String password = body.get("password");
+            User user = userService.login(email, password);
+            return ResponseEntity.ok(user);
+        } catch (IllegalArgumentException e) {
+            System.out.println("[ERROR] Login failed: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * GET /api/users/{id}
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable int id) {
+        return userService.getUserById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+}

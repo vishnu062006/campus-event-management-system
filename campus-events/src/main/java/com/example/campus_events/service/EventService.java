@@ -83,7 +83,6 @@ public class EventService {
         });
         return found;
     }
-
     /**
      * Delete event
      */
