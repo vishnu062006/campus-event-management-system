@@ -1,4 +1,4 @@
-# 🎓 Campus Event Management System
+# 🎯 Eventara — Campus Event Management System
 
 A full-stack event management system where students can create events, register for them, and administrators can manage participation.
 
