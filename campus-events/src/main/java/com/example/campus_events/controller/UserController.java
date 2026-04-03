@@ -1,6 +1,7 @@
 package com.example.campus_events.controller;
 
 import com.example.campus_events.model.User;
+import com.example.campus_events.security.JwtUtil;
 import com.example.campus_events.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     /**
      * POST /api/users/register
@@ -45,7 +49,15 @@ public class UserController {
             String email = body.get("email");
             String password = body.get("password");
             User user = userService.login(email, password);
-            return ResponseEntity.ok(user);
+            String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+            System.out.println("[INFO] JWT generated for: " + email);
+            return ResponseEntity.ok(Map.of(
+                    "token", token,
+                    "id", user.getId(),
+                    "name", user.getName(),
+                    "email", user.getEmail(),
+                    "role", user.getRole()
+            ));
         } catch (IllegalArgumentException e) {
             System.out.println("[ERROR] Login failed: " + e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

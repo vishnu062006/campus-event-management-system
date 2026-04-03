@@ -3,15 +3,25 @@ package com.example.campus_events.service;
 import com.example.campus_events.model.User;
 import com.example.campus_events.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
+/**
+ * Service handling user registration and login logic
+ */
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    /**
+     * Register a new user — password is hashed before saving
+     */
     public User register(String name, String email, String password, String role) {
         System.out.println("[INFO] Registering user: " + email);
 
@@ -28,20 +38,25 @@ public class UserService {
             throw new IllegalArgumentException("Email already registered");
         }
 
-        User user = new User(name, email, password, role);
+        // Hash password before saving
+        String hashedPassword = passwordEncoder.encode(password);
+        User user = new User(name, email, hashedPassword, role);
         User saved = userRepository.save(user);
         System.out.println("[INFO] User registered successfully: " + email);
         return saved;
     }
 
-
+    /**
+     * Login — compare raw password with hashed password
+     */
     public User login(String email, String password) {
         System.out.println("[INFO] Login attempt: " + email);
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        if (!user.getPassword().equals(password)) {
+        // BCrypt comparison
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             System.out.println("[WARN] Invalid password for: " + email);
             throw new IllegalArgumentException("Invalid password");
         }
