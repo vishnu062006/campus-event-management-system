@@ -1,0 +1,44 @@
+2026-04-04T11:37:29.901+05:30  INFO 52728 --- [main] c.e.c.CampusEventsApplication            : Starting CampusEventsApplication using Java 24 with PID 52728 (/Users/vishnumashalkar/Desktop/campus-event-management-system/campus-events/target/classes started by vishnumashalkar in /Users/vishnumashalkar/Desktop/campus-event-management-system/campus-events)
+2026-04-04T11:37:29.902+05:30  INFO 52728 --- [main] c.e.c.CampusEventsApplication            : No active profile set, falling back to 1 default profile: "default"
+2026-04-04T11:37:30.090+05:30  INFO 52728 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-04T11:37:30.109+05:30  INFO 52728 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 3 JPA repository interfaces.
+2026-04-04T11:37:30.260+05:30  INFO 52728 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-04-04T11:37:30.264+05:30  INFO 52728 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-04T11:37:30.264+05:30  INFO 52728 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.52]
+2026-04-04T11:37:30.278+05:30  INFO 52728 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-04-04T11:37:30.278+05:30  INFO 52728 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 364 ms
+2026-04-04T11:37:30.333+05:30  INFO 52728 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-04T11:37:30.349+05:30  INFO 52728 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.42.Final
+2026-04-04T11:37:30.360+05:30  INFO 52728 --- [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-04T11:37:30.442+05:30  INFO 52728 --- [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-04T11:37:30.452+05:30  INFO 52728 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-04T11:37:31.883+05:30  INFO 52728 --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@14201a90
+2026-04-04T11:37:31.884+05:30  INFO 52728 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-04T11:37:32.620+05:30  INFO 52728 --- [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.6
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-04T11:37:32.889+05:30  INFO 52728 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-04T11:37:34.974+05:30  INFO 52728 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-04T11:37:35.122+05:30  WARN 52728 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-04-04T11:37:35.129+05:30  INFO 52728 --- [main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2026-04-04T11:37:35.175+05:30  INFO 52728 --- [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsService
+2026-04-04T11:37:35.266+05:30  INFO 52728 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-04-04T11:37:35.269+05:30  INFO 52728 --- [main] c.e.c.CampusEventsApplication            : Started CampusEventsApplication in 5.513 seconds (process running for 5.728)
+2026-04-04T11:37:44.225+05:30  INFO 52728 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-04T11:37:44.225+05:30  INFO 52728 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-04T11:37:44.227+05:30  INFO 52728 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-04-04T11:37:44.267+05:30  INFO 52728 --- [http-nio-8080-exec-1] c.e.campus_events.service.UserService    : Login attempt: vee@gmail.com
+2026-04-04T11:37:44.690+05:30  INFO 52728 --- [http-nio-8080-exec-1] c.e.campus_events.service.UserService    : Login successful: vee@gmail.com
+2026-04-04T11:39:28.291+05:30  INFO 52728 --- [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-04T11:39:28.296+05:30  INFO 52728 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-04-04T11:39:28.299+05:30  INFO 52728 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-04T11:39:28.301+05:30  INFO 52728 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-04-04T11:39:28.831+05:30  INFO 52728 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-04-04T11:39:30.069+05:30  INFO 52777 --- [main] c.e.c.CampusEventsApplication            : Starting CampusEventsApplication using Java 24 with PID 52777 (/Users/vishnumashalkar/Desktop/campus-event-management-system/campus-events/target/classes started by vishnumashalkar in /Users/vishnumashalkar/Desktop/campus-event-management-system/campus-events)
+2026-04-04T11:39:30.070+05:30  INFO 52777 --- [main] c.e.c.CampusEventsApplication            : No active profile set, falling back to 1 default profile: "default"
+2026-04-04T11:39:35.820+05:30  INFO 52777 --- [main] c.e.c.CampusEventsApplication            : Started CampusEventsApplication in 5.909 seconds (process running for 6.149)

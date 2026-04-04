@@ -2,6 +2,8 @@ package com.example.campus_events.service;
 
 import com.example.campus_events.model.User;
 import com.example.campus_events.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,8 @@ import java.util.Optional;
 @Service
 public class UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+
     @Autowired
     private UserRepository userRepository;
 
@@ -23,7 +27,7 @@ public class UserService {
      * Register a new user — password is hashed before saving
      */
     public User register(String name, String email, String password, String role) {
-        System.out.println("[INFO] Registering user: " + email);
+        log.info("Registering user: {}", email);
 
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
@@ -38,11 +42,10 @@ public class UserService {
             throw new IllegalArgumentException("Email already registered");
         }
 
-        // Hash password before saving
         String hashedPassword = passwordEncoder.encode(password);
         User user = new User(name, email, hashedPassword, role);
         User saved = userRepository.save(user);
-        System.out.println("[INFO] User registered successfully: " + email);
+        log.info("User registered successfully: {}", email);
         return saved;
     }
 
@@ -50,18 +53,17 @@ public class UserService {
      * Login — compare raw password with hashed password
      */
     public User login(String email, String password) {
-        System.out.println("[INFO] Login attempt: " + email);
+        log.info("Login attempt: {}", email);
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // BCrypt comparison
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            System.out.println("[WARN] Invalid password for: " + email);
+            log.warn("Invalid password for: {}", email);
             throw new IllegalArgumentException("Invalid password");
         }
 
-        System.out.println("[INFO] Login successful: " + email);
+        log.info("Login successful: {}", email);
         return user;
     }
 
@@ -69,7 +71,7 @@ public class UserService {
      * Get user by ID
      */
     public Optional<User> getUserById(int id) {
-        System.out.println("[INFO] Fetching user ID: " + id);
+        log.info("Fetching user ID: {}", id);
         return userRepository.findById(id);
     }
 }
