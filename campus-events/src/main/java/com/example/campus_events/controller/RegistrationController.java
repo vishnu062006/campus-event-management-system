@@ -25,17 +25,9 @@ public class RegistrationController {
     @PostMapping("/{id}/register")
     public ResponseEntity<?> register(@PathVariable int id,
                                       @RequestBody Map<String, Integer> body) {
-        try {
-            Integer userId = body.get("userId");
-            Registration registration = registrationService.registerForEvent(userId, id);
-            return ResponseEntity.status(201).body(registration);
-        } catch (IllegalArgumentException e) {
-            System.out.println("[ERROR] Registration failed: " + e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        } catch (IllegalStateException e) {
-            System.out.println("[ERROR] Registration failed: " + e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        Integer userId = body.get("userId");
+        Registration registration = registrationService.registerForEvent(userId, id);
+        return ResponseEntity.status(201).body(registration);
     }
 
     /**
@@ -44,14 +36,10 @@ public class RegistrationController {
     @DeleteMapping("/{id}/register")
     public ResponseEntity<?> cancelRegistration(@PathVariable int id,
                                                 @RequestBody Map<String, Integer> body) {
-        try {
-            Integer userId = body.get("userId");
-            boolean cancelled = registrationService.cancelRegistration(userId, id);
-            if (cancelled) return ResponseEntity.ok(Map.of("message", "Registration cancelled"));
-            return ResponseEntity.notFound().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        Integer userId = body.get("userId");
+        boolean cancelled = registrationService.cancelRegistration(userId, id);
+        if (cancelled) return ResponseEntity.ok(Map.of("message", "Registration cancelled"));
+        return ResponseEntity.notFound().build();
     }
 
     /**
@@ -59,11 +47,7 @@ public class RegistrationController {
      */
     @GetMapping("/{id}/participants")
     public ResponseEntity<?> getParticipants(@PathVariable int id) {
-        try {
-            List<Registration> participants = registrationService.getParticipants(id);
-            return ResponseEntity.ok(participants);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        List<Registration> participants = registrationService.getParticipants(id);
+        return ResponseEntity.ok(participants);
     }
 }

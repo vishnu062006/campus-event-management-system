@@ -27,17 +27,12 @@ public class UserController {
      */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
-        try {
-            String name = body.get("name");
-            String email = body.get("email");
-            String password = body.get("password");
-            String role = body.getOrDefault("role", "student");
-            User user = userService.register(name, email, password, role);
-            return ResponseEntity.status(201).body(user);
-        } catch (IllegalArgumentException e) {
-            System.out.println("[ERROR] Registration failed: " + e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        String name = body.get("name");
+        String email = body.get("email");
+        String password = body.get("password");
+        String role = body.getOrDefault("role", "student");
+        User user = userService.register(name, email, password, role);
+        return ResponseEntity.status(201).body(user);
     }
 
     /**
@@ -45,23 +40,18 @@ public class UserController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        try {
-            String email = body.get("email");
-            String password = body.get("password");
-            User user = userService.login(email, password);
-            String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
-            System.out.println("[INFO] JWT generated for: " + email);
-            return ResponseEntity.ok(Map.of(
-                    "token", token,
-                    "id", user.getId(),
-                    "name", user.getName(),
-                    "email", user.getEmail(),
-                    "role", user.getRole()
-            ));
-        } catch (IllegalArgumentException e) {
-            System.out.println("[ERROR] Login failed: " + e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        String email = body.get("email");
+        String password = body.get("password");
+        User user = userService.login(email, password);
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        System.out.println("[INFO] JWT generated for: " + email);
+        return ResponseEntity.ok(Map.of(
+                "token", token,
+                "id", user.getId(),
+                "name", user.getName(),
+                "email", user.getEmail(),
+                "role", user.getRole()
+        ));
     }
 
     /**

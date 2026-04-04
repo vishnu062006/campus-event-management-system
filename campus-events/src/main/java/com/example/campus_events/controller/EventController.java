@@ -25,20 +25,15 @@ public class EventController {
      */
     @PostMapping
     public ResponseEntity<?> createEvent(@RequestBody Map<String, String> body) {
-        try {
-            String title = body.get("title");
-            String description = body.get("description");
-            LocalDateTime eventDate = LocalDateTime.parse(body.get("eventDate"));
-            String location = body.get("location");
-            Integer maxParticipants = Integer.parseInt(body.get("maxParticipants"));
-            Integer organizerId = Integer.parseInt(body.get("organizerId"));
-            Event event = eventService.createEvent(title, description, eventDate,
-                    location, maxParticipants, organizerId);
-            return ResponseEntity.status(201).body(event);
-        } catch (IllegalArgumentException e) {
-            System.out.println("[ERROR] Event creation failed: " + e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        String title = body.get("title");
+        String description = body.get("description");
+        LocalDateTime eventDate = LocalDateTime.parse(body.get("eventDate"));
+        String location = body.get("location");
+        Integer maxParticipants = Integer.parseInt(body.get("maxParticipants"));
+        Integer organizerId = Integer.parseInt(body.get("organizerId"));
+        Event event = eventService.createEvent(title, description, eventDate,
+                location, maxParticipants, organizerId);
+        return ResponseEntity.status(201).body(event);
     }
 
     /**
@@ -65,19 +60,15 @@ public class EventController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEvent(@PathVariable int id,
                                          @RequestBody Map<String, String> body) {
-        try {
-            String title = body.get("title");
-            String description = body.get("description");
-            LocalDateTime eventDate = LocalDateTime.parse(body.get("eventDate"));
-            String location = body.get("location");
-            Integer maxParticipants = Integer.parseInt(body.get("maxParticipants"));
-            return eventService.updateEvent(id, title, description, eventDate,
-                            location, maxParticipants)
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        String title = body.get("title");
+        String description = body.get("description");
+        LocalDateTime eventDate = LocalDateTime.parse(body.get("eventDate"));
+        String location = body.get("location");
+        Integer maxParticipants = Integer.parseInt(body.get("maxParticipants"));
+        return eventService.updateEvent(id, title, description, eventDate,
+                        location, maxParticipants)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /**
