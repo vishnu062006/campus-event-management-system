@@ -29,6 +29,11 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "profile_picture")
+    private String profilePicture;
+
+
+
     public User() { }
 
     public User(String name, String email, String password, String role) {
@@ -52,4 +57,6 @@ public class User {
     public Double getWalletBalance() { return walletBalance; }
     public void setWalletBalance(Double walletBalance) { this.walletBalance = walletBalance; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+    public String getProfilePicture() { return profilePicture; }
+    public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
 }

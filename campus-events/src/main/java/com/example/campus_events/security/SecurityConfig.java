@@ -29,33 +29,35 @@ public class SecurityConfig {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private GoogleOAuthSuccessHandler googleOAuthSuccessHandler;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // public endpoints
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/api/users/login").permitAll()
                         .requestMatchers("/api/events").permitAll()
                         .requestMatchers("/api/events/{id}").permitAll()
-
-                        // preflight
+                        .requestMatchers("/login/oauth2/**").permitAll()
+                        .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // protected
                         .requestMatchers("/api/events/*/register").authenticated()
                         .requestMatchers("/api/events/*/participants").authenticated()
                         .requestMatchers("/api/wallet/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/events/*/status").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/events/*/waitlist").authenticated()
                         .requestMatchers("/api/events/*/image").authenticated()
-
                         .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(googleOAuthSuccessHandler)
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -65,29 +67,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
                 "https://eventara-frontend.vercel.app",
                 "https://eventara-frontend-o02bffke5-vishnumashalkar-1842s-projects.vercel.app"
         ));
-
-        config.setAllowedMethods(List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS"
-        ));
-
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
-
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
         return source;
     }
 
@@ -101,12 +91,11 @@ public class SecurityConfig {
         return username -> {
             com.example.campus_events.model.User user =
                     userRepository.findByEmail(username)
-                            .orElseThrow(() ->
-                                    new UsernameNotFoundException("User not found: " + username));
+                            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getEmail())
-                    .password(user.getPassword())
+                    .password(user.getPassword() != null ? user.getPassword() : "")
                     .roles(user.getRole().toUpperCase())
                     .build();
         };

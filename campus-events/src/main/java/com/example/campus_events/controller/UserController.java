@@ -30,8 +30,8 @@ public class UserController {
         String name = body.get("name");
         String email = body.get("email");
         String password = body.get("password");
-        String role = body.getOrDefault("role", "student");
-        User user = userService.register(name, email, password, role);
+        String role = "STUDENT";
+        User user = userService.register(name, email, password);
         return ResponseEntity.status(201).body(user);
     }
 

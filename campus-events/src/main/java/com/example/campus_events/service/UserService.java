@@ -26,7 +26,7 @@ public class UserService {
     /**
      * Register a new user — password is hashed before saving
      */
-    public User register(String name, String email, String password, String role) {
+    public User register(String name, String email, String password) {
         log.info("Registering user: {}", email);
 
         if (name == null || name.trim().isEmpty()) {
@@ -43,7 +43,7 @@ public class UserService {
         }
 
         String hashedPassword = passwordEncoder.encode(password);
-        User user = new User(name, email, hashedPassword, role);
+        User user = new User(name, email, hashedPassword, "STUDENT");
         User saved = userRepository.save(user);
         log.info("User registered successfully: {}", email);
         return saved;
