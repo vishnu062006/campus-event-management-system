@@ -35,20 +35,19 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .authorizeHttpRequests(auth -> auth
-
-                        // PUBLIC ENDPOINTS
+                        // public endpoints
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/api/users/login").permitAll()
                         .requestMatchers("/api/events").permitAll()
                         .requestMatchers("/api/events/{id}").permitAll()
 
-                        // allow preflight requests
+                        // preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // AUTH REQUIRED
+                        // protected
                         .requestMatchers("/api/events/*/register").authenticated()
                         .requestMatchers("/api/events/*/participants").authenticated()
                         .requestMatchers("/api/wallet/**").authenticated()
@@ -58,7 +57,6 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
-
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -70,6 +68,7 @@ public class SecurityConfig {
 
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
+                "https://eventara-frontend.vercel.app",
                 "https://eventara-frontend-o02bffke5-vishnumashalkar-1842s-projects.vercel.app"
         ));
 

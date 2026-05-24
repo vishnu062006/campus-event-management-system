@@ -15,3 +15,6 @@
 2026-05-24T13:30:26.852+05:30  INFO 95377 --- [http-nio-8080-exec-7] c.e.campus_events.service.EventService   : Fetching all events
 2026-05-24T13:30:27.673+05:30  INFO 95377 --- [http-nio-8080-exec-10] c.e.campus_events.service.EventService   : Fetching all events
 2026-05-24T13:30:28.456+05:30  INFO 95377 --- [http-nio-8080-exec-6] c.e.campus_events.service.EventService   : Fetching all events
+2026-05-24T14:42:32.539+05:30  INFO 97881 --- [main] c.e.c.CampusEventsApplication            : Starting CampusEventsApplication using Java 24 with PID 97881 (/Users/vishnumashalkar/Desktop/campus-event-management-system/campus-events/target/classes started by vishnumashalkar in /Users/vishnumashalkar/Desktop/campus-event-management-system/campus-events)
+2026-05-24T14:42:32.540+05:30  INFO 97881 --- [main] c.e.c.CampusEventsApplication            : No active profile set, falling back to 1 default profile: "default"
+2026-05-24T14:42:41.184+05:30  INFO 97881 --- [main] c.e.c.CampusEventsApplication            : Started CampusEventsApplication in 8.796 seconds (process running for 9.06)
