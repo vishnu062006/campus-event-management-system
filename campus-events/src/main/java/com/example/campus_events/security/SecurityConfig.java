@@ -39,24 +39,23 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // ✅ PUBLIC ENDPOINTS
+                        // PUBLIC ENDPOINTS
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/api/users/login").permitAll()
                         .requestMatchers("/api/events").permitAll()
                         .requestMatchers("/api/events/{id}").permitAll()
-                        .requestMatchers("/", "/index.html", "/**/*.js", "/**/*.css").permitAll()
 
-                        // ✅ AUTH REQUIRED - EVENTS
+                        // allow preflight requests
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // AUTH REQUIRED
                         .requestMatchers("/api/events/*/register").authenticated()
                         .requestMatchers("/api/events/*/participants").authenticated()
-
-                        // 🔥 NEWLY ADDED (YOUR PART)
                         .requestMatchers("/api/wallet/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/events/*/status").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/events/*/waitlist").authenticated()
                         .requestMatchers("/api/events/*/image").authenticated()
 
-                        // ✅ FALLBACK
                         .anyRequest().authenticated()
                 )
 
@@ -69,12 +68,25 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "https://eventara-frontend-o02bffke5-vishnumashalkar-1842s-projects.vercel.app"
+        ));
+
+        config.setAllowedMethods(List.of(
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE",
+                "OPTIONS"
+        ));
+
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", config);
 
         return source;
