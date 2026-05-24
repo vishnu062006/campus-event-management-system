@@ -1,53 +1,63 @@
 package com.example.campus_events.controller;
 
 import com.example.campus_events.model.Registration;
+import com.example.campus_events.model.WaitingList;
 import com.example.campus_events.service.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 
-/**
- * REST Controller for Registration endpoints
- */
 @RestController
 @RequestMapping("/api/events")
-@CrossOrigin(origins = "*")
 public class RegistrationController {
 
-    @Autowired
-    private RegistrationService registrationService;
+    @Autowired private RegistrationService registrationService;
 
-    /**
-     * POST /api/events/{id}/register
-     */
     @PostMapping("/{id}/register")
-    public ResponseEntity<?> register(@PathVariable int id,
+    public ResponseEntity<?> register(@PathVariable Integer id,
                                       @RequestBody Map<String, Integer> body) {
-        Integer userId = body.get("userId");
-        Registration registration = registrationService.registerForEvent(userId, id);
-        return ResponseEntity.status(201).body(registration);
+        try {
+            Registration r = registrationService.registerForEvent(body.get("userId"), id);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Registration successful",
+                    "registrationId", r.getId()
+            ));
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 
-    /**
-     * DELETE /api/events/{id}/register
-     */
     @DeleteMapping("/{id}/register")
-    public ResponseEntity<?> cancelRegistration(@PathVariable int id,
-                                                @RequestBody Map<String, Integer> body) {
-        Integer userId = body.get("userId");
-        boolean cancelled = registrationService.cancelRegistration(userId, id);
-        if (cancelled) return ResponseEntity.ok(Map.of("message", "Registration cancelled"));
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<?> cancel(@PathVariable Integer id,
+                                    @RequestBody Map<String, Integer> body) {
+        try {
+            boolean cancelled = registrationService.cancelRegistration(body.get("userId"), id);
+            return cancelled
+                    ? ResponseEntity.ok(Map.of("message", "Registration cancelled"))
+                    : ResponseEntity.badRequest().body(Map.of("message", "Registration not found"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 
-    /**
-     * GET /api/events/{id}/participants
-     */
     @GetMapping("/{id}/participants")
-    public ResponseEntity<?> getParticipants(@PathVariable int id) {
-        List<Registration> participants = registrationService.getParticipants(id);
-        return ResponseEntity.ok(participants);
+    public ResponseEntity<List<Registration>> getParticipants(@PathVariable Integer id) {
+        return ResponseEntity.ok(registrationService.getParticipants(id));
+    }
+
+    @GetMapping("/{id}/waitlist")
+    public ResponseEntity<List<WaitingList>> getWaitlist(@PathVariable Integer id) {
+        return ResponseEntity.ok(registrationService.getWaitlist(id));
+    }
+
+    // ✅ Clean endpoint to check registration status — used by frontend
+    @GetMapping("/{id}/status")
+    public ResponseEntity<?> getStatus(@PathVariable Integer id,
+                                       @RequestParam Integer userId) {
+        boolean registered = registrationService.isRegistered(userId, id);
+        return ResponseEntity.ok(Map.of("registered", registered));
     }
 }

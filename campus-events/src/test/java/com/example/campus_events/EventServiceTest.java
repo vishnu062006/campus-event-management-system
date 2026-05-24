@@ -1,6 +1,7 @@
 package com.example.campus_events;
 
 import com.example.campus_events.model.Event;
+import com.example.campus_events.model.EventStatus;
 import com.example.campus_events.model.User;
 import com.example.campus_events.repository.EventRepository;
 import com.example.campus_events.repository.UserRepository;
@@ -45,12 +46,15 @@ public class EventServiceTest {
         Event event = eventService.createEvent(
                 "Tech Fest", "Description",
                 LocalDateTime.now().plusDays(7),
-                "BMS College", 75, 1
+                LocalDateTime.now().plusDays(7),
+                LocalDateTime.now().plusDays(7).plusHours(8),
+                "BMS College", 75, 100.0, 1
         );
 
         assertEquals("Tech Fest", event.getTitle());
         assertEquals(75, event.getMaxParticipants());
         assertEquals(organizer, event.getOrganizer());
+        assertEquals(EventStatus.UPCOMING, event.getStatus());
     }
 
     @Test
@@ -58,7 +62,8 @@ public class EventServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 eventService.createEvent("", "Desc",
                         LocalDateTime.now().plusDays(7),
-                        "BMS", 75, 1)
+                        null, null,
+                        "BMS", 75, 0.0, 1)
         );
     }
 
@@ -66,8 +71,9 @@ public class EventServiceTest {
     void testCreateEventPastDate() {
         assertThrows(IllegalArgumentException.class, () ->
                 eventService.createEvent("Tech Fest", "Desc",
-                        LocalDateTime.now().minusDays(1), // past date
-                        "BMS", 75, 1)
+                        LocalDateTime.now().minusDays(1),
+                        null, null,
+                        "BMS", 75, 0.0, 1)
         );
     }
 
@@ -76,7 +82,8 @@ public class EventServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 eventService.createEvent("Tech Fest", "Desc",
                         LocalDateTime.now().plusDays(7),
-                        "BMS", 0, 1) // zero capacity
+                        null, null,
+                        "BMS", 0, 0.0, 1)
         );
     }
 
@@ -87,7 +94,8 @@ public class EventServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 eventService.createEvent("Tech Fest", "Desc",
                         LocalDateTime.now().plusDays(7),
-                        "BMS", 75, 99)
+                        null, null,
+                        "BMS", 75, 0.0, 99)
         );
     }
 
@@ -99,6 +107,7 @@ public class EventServiceTest {
                 new Event("Cultural Fest", "Desc", LocalDateTime.now().plusDays(14), "BMS", 100, organizer)
         );
         when(eventRepository.findAll()).thenReturn(mockEvents);
+        when(eventRepository.save(any(Event.class))).thenAnswer(i -> i.getArgument(0));
 
         List<Event> events = eventService.getAllEvents();
         assertEquals(2, events.size());

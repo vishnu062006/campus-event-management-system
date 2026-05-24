@@ -1,6 +1,7 @@
 package com.example.campus_events.service;
 
 import com.example.campus_events.model.Event;
+import com.example.campus_events.model.EventStatus;
 import com.example.campus_events.model.User;
 import com.example.campus_events.repository.EventRepository;
 import com.example.campus_events.repository.UserRepository;
@@ -27,10 +28,22 @@ public class EventService {
     private UserRepository userRepository;
 
     /**
+     * Auto calculate event status based on current time
+     */
+    private EventStatus calculateStatus(LocalDateTime eventDate, LocalDateTime endTime) {
+        LocalDateTime now = LocalDateTime.now();
+        if (endTime != null && now.isAfter(endTime)) return EventStatus.EXPIRED;
+        if (now.isAfter(eventDate)) return EventStatus.ONGOING;
+        return EventStatus.UPCOMING;
+    }
+
+    /**
      * Create a new event
      */
     public Event createEvent(String title, String description, LocalDateTime eventDate,
-                             String location, Integer maxParticipants, Integer organizerId) {
+                             LocalDateTime startTime, LocalDateTime endTime,
+                             String location, Integer maxParticipants,
+                             Double entryFee, Integer organizerId) {
         log.info("Creating event: {}", title);
 
         if (title == null || title.trim().isEmpty()) {
@@ -47,17 +60,38 @@ public class EventService {
                 .orElseThrow(() -> new IllegalArgumentException("Organizer not found"));
 
         Event event = new Event(title, description, eventDate, location, maxParticipants, organizer);
+        event.setStartTime(startTime);
+        event.setEndTime(endTime);
+        event.setEntryFee(entryFee != null ? entryFee : 0.0);
+        event.setStatus(calculateStatus(eventDate, endTime));
+
         Event saved = eventRepository.save(event);
         log.info("Event created successfully: {}", title);
         return saved;
     }
 
     /**
-     * Get all events
+     * Get all events with auto-updated status
      */
     public List<Event> getAllEvents() {
         log.info("Fetching all events");
-        return eventRepository.findAll();
+        List<Event> events = eventRepository.findAll();
+        events.forEach(e -> {
+            EventStatus newStatus = calculateStatus(e.getEventDate(), e.getEndTime());
+            if (e.getStatus() != newStatus) {
+                e.setStatus(newStatus);
+                eventRepository.save(e);
+            }
+        });
+        return events;
+    }
+
+    /**
+     * Get events by status
+     */
+    public List<Event> getEventsByStatus(EventStatus status) {
+        log.info("Fetching events by status: {}", status);
+        return eventRepository.findByStatus(status);
     }
 
     /**
@@ -72,16 +106,21 @@ public class EventService {
      * Update event
      */
     public Optional<Event> updateEvent(int id, String title, String description,
-                                       LocalDateTime eventDate, String location,
-                                       Integer maxParticipants) {
+                                       LocalDateTime eventDate, LocalDateTime startTime,
+                                       LocalDateTime endTime, String location,
+                                       Integer maxParticipants, Double entryFee) {
         log.info("Updating event ID: {}", id);
         Optional<Event> found = eventRepository.findById(id);
         found.ifPresent(e -> {
             e.setTitle(title);
             e.setDescription(description);
             e.setEventDate(eventDate);
+            e.setStartTime(startTime);
+            e.setEndTime(endTime);
             e.setLocation(location);
             e.setMaxParticipants(maxParticipants);
+            e.setEntryFee(entryFee != null ? entryFee : 0.0);
+            e.setStatus(calculateStatus(eventDate, endTime));
             eventRepository.save(e);
             log.info("Event updated: {}", id);
         });

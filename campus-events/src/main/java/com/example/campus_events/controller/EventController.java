@@ -1,6 +1,7 @@
 package com.example.campus_events.controller;
 
 import com.example.campus_events.model.Event;
+import com.example.campus_events.model.EventStatus;
 import com.example.campus_events.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +29,14 @@ public class EventController {
         String title = body.get("title");
         String description = body.get("description");
         LocalDateTime eventDate = LocalDateTime.parse(body.get("eventDate"));
+        LocalDateTime startTime = body.get("startTime") != null ? LocalDateTime.parse(body.get("startTime")) : null;
+        LocalDateTime endTime = body.get("endTime") != null ? LocalDateTime.parse(body.get("endTime")) : null;
         String location = body.get("location");
         Integer maxParticipants = Integer.parseInt(body.get("maxParticipants"));
+        Double entryFee = body.get("entryFee") != null ? Double.parseDouble(body.get("entryFee")) : 0.0;
         Integer organizerId = Integer.parseInt(body.get("organizerId"));
-        Event event = eventService.createEvent(title, description, eventDate,
-                location, maxParticipants, organizerId);
+        Event event = eventService.createEvent(title, description, eventDate, startTime,
+                endTime, location, maxParticipants, entryFee, organizerId);
         return ResponseEntity.status(201).body(event);
     }
 
@@ -40,7 +44,10 @@ public class EventController {
      * GET /api/events
      */
     @GetMapping
-    public List<Event> getAllEvents() {
+    public List<Event> getAllEvents(@RequestParam(required = false) String status) {
+        if (status != null) {
+            return eventService.getEventsByStatus(EventStatus.valueOf(status.toUpperCase()));
+        }
         return eventService.getAllEvents();
     }
 
@@ -63,10 +70,13 @@ public class EventController {
         String title = body.get("title");
         String description = body.get("description");
         LocalDateTime eventDate = LocalDateTime.parse(body.get("eventDate"));
+        LocalDateTime startTime = body.get("startTime") != null ? LocalDateTime.parse(body.get("startTime")) : null;
+        LocalDateTime endTime = body.get("endTime") != null ? LocalDateTime.parse(body.get("endTime")) : null;
         String location = body.get("location");
         Integer maxParticipants = Integer.parseInt(body.get("maxParticipants"));
-        return eventService.updateEvent(id, title, description, eventDate,
-                        location, maxParticipants)
+        Double entryFee = body.get("entryFee") != null ? Double.parseDouble(body.get("entryFee")) : 0.0;
+        return eventService.updateEvent(id, title, description, eventDate, startTime,
+                        endTime, location, maxParticipants, entryFee)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

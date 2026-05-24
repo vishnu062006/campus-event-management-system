@@ -21,7 +21,10 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private String role; // "student" or "admin"
+    private String role;
+
+    @Column(name = "wallet_balance", nullable = false)
+    private Double walletBalance = 1000.0; // default ₹1000 on signup
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -34,6 +37,7 @@ public class User {
         this.password = password;
         this.role = role;
         this.createdAt = LocalDateTime.now();
+        this.walletBalance = 1000.0;
     }
 
     public Integer getId() { return id; }
@@ -45,5 +49,7 @@ public class User {
     public void setPassword(String password) { this.password = password; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    public Double getWalletBalance() { return walletBalance; }
+    public void setWalletBalance(Double walletBalance) { this.walletBalance = walletBalance; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }
