@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -32,26 +33,43 @@ public class EventService {
      */
     private EventStatus calculateStatus(LocalDateTime eventDate, LocalDateTime endTime) {
         LocalDateTime now = LocalDateTime.now();
-        if (endTime != null && now.isAfter(endTime)) return EventStatus.EXPIRED;
-        if (now.isAfter(eventDate)) return EventStatus.ONGOING;
+
+        if (endTime != null && now.isAfter(endTime)) {
+            return EventStatus.EXPIRED;
+        }
+
+        if (now.isAfter(eventDate)) {
+            return EventStatus.ONGOING;
+        }
+
         return EventStatus.UPCOMING;
     }
 
     /**
      * Create a new event
      */
-    public Event createEvent(String title, String description, LocalDateTime eventDate,
-                             LocalDateTime startTime, LocalDateTime endTime,
-                             String location, Integer maxParticipants,
-                             Double entryFee, Integer organizerId) {
+    public Event createEvent(
+            String title,
+            String description,
+            LocalDateTime eventDate,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            String location,
+            Integer maxParticipants,
+            Double entryFee,
+            Integer organizerId,
+            String imageUrl
+    ) {
         log.info("Creating event: {}", title);
 
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title cannot be empty");
         }
+
         if (eventDate == null || eventDate.isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Event date must be in the future");
         }
+
         if (maxParticipants == null || maxParticipants <= 0) {
             throw new IllegalArgumentException("Max participants must be positive");
         }
@@ -59,14 +77,25 @@ public class EventService {
         User organizer = userRepository.findById(organizerId)
                 .orElseThrow(() -> new IllegalArgumentException("Organizer not found"));
 
-        Event event = new Event(title, description, eventDate, location, maxParticipants, organizer);
+        Event event = new Event(
+                title,
+                description,
+                eventDate,
+                location,
+                maxParticipants,
+                organizer
+        );
+
         event.setStartTime(startTime);
         event.setEndTime(endTime);
         event.setEntryFee(entryFee != null ? entryFee : 0.0);
+        event.setImageUrl(imageUrl != null ? imageUrl : "");
         event.setStatus(calculateStatus(eventDate, endTime));
 
         Event saved = eventRepository.save(event);
+
         log.info("Event created successfully: {}", title);
+
         return saved;
     }
 
@@ -75,14 +104,21 @@ public class EventService {
      */
     public List<Event> getAllEvents() {
         log.info("Fetching all events");
+
         List<Event> events = eventRepository.findAll();
-        events.forEach(e -> {
-            EventStatus newStatus = calculateStatus(e.getEventDate(), e.getEndTime());
-            if (e.getStatus() != newStatus) {
-                e.setStatus(newStatus);
-                eventRepository.save(e);
+
+        events.forEach(event -> {
+            EventStatus newStatus = calculateStatus(
+                    event.getEventDate(),
+                    event.getEndTime()
+            );
+
+            if (event.getStatus() != newStatus) {
+                event.setStatus(newStatus);
+                eventRepository.save(event);
             }
         });
+
         return events;
     }
 
@@ -105,25 +141,39 @@ public class EventService {
     /**
      * Update event
      */
-    public Optional<Event> updateEvent(int id, String title, String description,
-                                       LocalDateTime eventDate, LocalDateTime startTime,
-                                       LocalDateTime endTime, String location,
-                                       Integer maxParticipants, Double entryFee) {
+    public Optional<Event> updateEvent(
+            int id,
+            String title,
+            String description,
+            LocalDateTime eventDate,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            String location,
+            Integer maxParticipants,
+            Double entryFee,
+            String imageUrl
+    ) {
         log.info("Updating event ID: {}", id);
+
         Optional<Event> found = eventRepository.findById(id);
-        found.ifPresent(e -> {
-            e.setTitle(title);
-            e.setDescription(description);
-            e.setEventDate(eventDate);
-            e.setStartTime(startTime);
-            e.setEndTime(endTime);
-            e.setLocation(location);
-            e.setMaxParticipants(maxParticipants);
-            e.setEntryFee(entryFee != null ? entryFee : 0.0);
-            e.setStatus(calculateStatus(eventDate, endTime));
-            eventRepository.save(e);
-            log.info("Event updated: {}", id);
+
+        found.ifPresent(event -> {
+            event.setTitle(title);
+            event.setDescription(description);
+            event.setEventDate(eventDate);
+            event.setStartTime(startTime);
+            event.setEndTime(endTime);
+            event.setLocation(location);
+            event.setMaxParticipants(maxParticipants);
+            event.setEntryFee(entryFee != null ? entryFee : 0.0);
+            event.setImageUrl(imageUrl != null ? imageUrl : "");
+            event.setStatus(calculateStatus(eventDate, endTime));
+
+            eventRepository.save(event);
+
+            log.info("Event updated successfully: {}", id);
         });
+
         return found;
     }
 
@@ -136,6 +186,7 @@ public class EventService {
             log.info("Event deleted: {}", id);
             return true;
         }
+
         log.warn("Event not found: {}", id);
         return false;
     }

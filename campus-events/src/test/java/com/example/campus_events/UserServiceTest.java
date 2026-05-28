@@ -30,11 +30,10 @@ public class UserServiceTest {
         when(userRepository.existsByEmail("vishnu@example.com")).thenReturn(false);
         when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
-        User user = userService.register("Vishnu", "vishnu@example.com", "pass123", "student");
+        User user = userService.register("Vishnu", "vishnu@example.com", "pass123");
 
         assertEquals("Vishnu", user.getName());
         assertEquals("vishnu@example.com", user.getEmail());
-        assertEquals("student", user.getRole());
     }
 
     @Test
@@ -42,21 +41,21 @@ public class UserServiceTest {
         when(userRepository.existsByEmail("vishnu@example.com")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () ->
-                userService.register("Vishnu", "vishnu@example.com", "pass123", "student")
+                userService.register("Vishnu", "vishnu@example.com", "pass123")
         );
     }
 
     @Test
     void testRegisterEmptyName() {
         assertThrows(IllegalArgumentException.class, () ->
-                userService.register("", "vishnu@example.com", "pass123", "student")
+                userService.register("", "vishnu@example.com", "pass123")
         );
     }
 
     @Test
     void testRegisterShortPassword() {
         assertThrows(IllegalArgumentException.class, () ->
-                userService.register("Vishnu", "vishnu@example.com", "123", "student")
+                userService.register("Vishnu", "vishnu@example.com", "123")
         );
     }
 

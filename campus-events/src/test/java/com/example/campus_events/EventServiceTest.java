@@ -11,16 +11,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-/**
- * Unit tests for EventService
- */
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
 
@@ -40,15 +39,21 @@ public class EventServiceTest {
     @Test
     void testCreateEventSuccess() {
         User organizer = mockOrganizer();
+
         when(userRepository.findById(1)).thenReturn(Optional.of(organizer));
         when(eventRepository.save(any(Event.class))).thenAnswer(i -> i.getArgument(0));
 
         Event event = eventService.createEvent(
-                "Tech Fest", "Description",
+                "Tech Fest",
+                "Description",
                 LocalDateTime.now().plusDays(7),
                 LocalDateTime.now().plusDays(7),
                 LocalDateTime.now().plusDays(7).plusHours(8),
-                "BMS College", 75, 100.0, 1
+                "BMS College",
+                75,
+                100.0,
+                1,
+                ""
         );
 
         assertEquals("Tech Fest", event.getTitle());
@@ -60,30 +65,54 @@ public class EventServiceTest {
     @Test
     void testCreateEventEmptyTitle() {
         assertThrows(IllegalArgumentException.class, () ->
-                eventService.createEvent("", "Desc",
+                eventService.createEvent(
+                        "",
+                        "Desc",
                         LocalDateTime.now().plusDays(7),
-                        null, null,
-                        "BMS", 75, 0.0, 1)
+                        null,
+                        null,
+                        "BMS",
+                        75,
+                        0.0,
+                        1,
+                        ""
+                )
         );
     }
 
     @Test
     void testCreateEventPastDate() {
         assertThrows(IllegalArgumentException.class, () ->
-                eventService.createEvent("Tech Fest", "Desc",
+                eventService.createEvent(
+                        "Tech Fest",
+                        "Desc",
                         LocalDateTime.now().minusDays(1),
-                        null, null,
-                        "BMS", 75, 0.0, 1)
+                        null,
+                        null,
+                        "BMS",
+                        75,
+                        0.0,
+                        1,
+                        ""
+                )
         );
     }
 
     @Test
     void testCreateEventInvalidCapacity() {
         assertThrows(IllegalArgumentException.class, () ->
-                eventService.createEvent("Tech Fest", "Desc",
+                eventService.createEvent(
+                        "Tech Fest",
+                        "Desc",
                         LocalDateTime.now().plusDays(7),
-                        null, null,
-                        "BMS", 0, 0.0, 1)
+                        null,
+                        null,
+                        "BMS",
+                        0,
+                        0.0,
+                        1,
+                        ""
+                )
         );
     }
 
@@ -92,24 +121,49 @@ public class EventServiceTest {
         when(userRepository.findById(99)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () ->
-                eventService.createEvent("Tech Fest", "Desc",
+                eventService.createEvent(
+                        "Tech Fest",
+                        "Desc",
                         LocalDateTime.now().plusDays(7),
-                        null, null,
-                        "BMS", 75, 0.0, 99)
+                        null,
+                        null,
+                        "BMS",
+                        75,
+                        0.0,
+                        99,
+                        ""
+                )
         );
     }
 
     @Test
     void testGetAllEvents() {
         User organizer = mockOrganizer();
+
         List<Event> mockEvents = List.of(
-                new Event("Tech Fest", "Desc", LocalDateTime.now().plusDays(7), "BMS", 75, organizer),
-                new Event("Cultural Fest", "Desc", LocalDateTime.now().plusDays(14), "BMS", 100, organizer)
+                new Event(
+                        "Tech Fest",
+                        "Desc",
+                        LocalDateTime.now().plusDays(7),
+                        "BMS",
+                        75,
+                        organizer
+                ),
+                new Event(
+                        "Cultural Fest",
+                        "Desc",
+                        LocalDateTime.now().plusDays(14),
+                        "BMS",
+                        100,
+                        organizer
+                )
         );
+
         when(eventRepository.findAll()).thenReturn(mockEvents);
         when(eventRepository.save(any(Event.class))).thenAnswer(i -> i.getArgument(0));
 
         List<Event> events = eventService.getAllEvents();
+
         assertEquals(2, events.size());
     }
 
@@ -118,6 +172,7 @@ public class EventServiceTest {
         when(eventRepository.existsById(1)).thenReturn(true);
 
         boolean result = eventService.deleteEvent(1);
+
         assertTrue(result);
         verify(eventRepository, times(1)).deleteById(1);
     }
@@ -127,6 +182,7 @@ public class EventServiceTest {
         when(eventRepository.existsById(99)).thenReturn(false);
 
         boolean result = eventService.deleteEvent(99);
+
         assertFalse(result);
     }
 }

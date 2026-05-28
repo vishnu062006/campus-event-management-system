@@ -38,6 +38,7 @@ public class Event {
     @Column(name = "image_url")
     private String imageUrl;
 
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EventStatus status = EventStatus.UPCOMING;

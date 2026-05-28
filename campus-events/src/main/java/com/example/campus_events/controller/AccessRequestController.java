@@ -5,9 +5,8 @@ import com.example.campus_events.service.AccessRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.Map;
 import java.util.UUID;
@@ -20,17 +19,17 @@ public class AccessRequestController {
     private AccessRequestService accessRequestService;
 
     @PostMapping
-    public ResponseEntity<?> requestAccess(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> requestAccess(Authentication authentication) {
         try {
-            return ResponseEntity.ok(accessRequestService.createRequest(userDetails.getUsername()));
+            return ResponseEntity.ok(accessRequestService.createRequest(authentication.getName()));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 
     @GetMapping("/my-status")
-    public ResponseEntity<?> getMyStatus(@AuthenticationPrincipal UserDetails userDetails) {
-        return accessRequestService.getMyStatus(userDetails.getUsername())
+    public ResponseEntity<?> getMyStatus(Authentication authentication) {
+        return accessRequestService.getMyStatus(authentication.getName())
                 .map(req -> ResponseEntity.ok(Map.of("status", req.getStatus())))
                 .orElse(ResponseEntity.ok(Map.of("status", "")));
     }

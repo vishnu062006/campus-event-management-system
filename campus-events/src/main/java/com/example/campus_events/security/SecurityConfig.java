@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/events/*/status").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/events/*/waitlist").authenticated()
                         .requestMatchers("/api/events/*/image").authenticated()
+                        .requestMatchers("/api/access-requests/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

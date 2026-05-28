@@ -12,33 +12,73 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/events")
+@CrossOrigin(origins = "*")
 public class RegistrationController {
 
     @Autowired private RegistrationService registrationService;
 
     @PostMapping("/{id}/register")
     public ResponseEntity<?> register(@PathVariable Integer id,
-                                      @RequestBody Map<String, Integer> body) {
+                                      @RequestBody Map<String, Object> body) { // Changed to Object to prevent 400 type crashes
         try {
-            Registration r = registrationService.registerForEvent(body.get("userId"), id);
+            if (!body.containsKey("userId") || body.get("userId") == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "userId is required"));
+            }
+
+            // Safely extract and convert userId whether frontend sent a String or an Integer
+            Integer userId;
+            Object userIdObj = body.get("userId");
+            if (userIdObj instanceof Integer) {
+                userId = (Integer) userIdObj;
+            } else {
+                userId = Integer.parseInt(userIdObj.toString());
+            }
+
+            Registration r = registrationService.registerForEvent(userId, id);
+
             return ResponseEntity.ok(Map.of(
                     "message", "Registration successful",
                     "registrationId", r.getId()
             ));
-        } catch (IllegalStateException | IllegalArgumentException e) {
+
+        } catch (IllegalStateException e) {
+            if (e.getMessage().contains("waitlist")) {
+                return ResponseEntity.status(202).body(Map.of(
+                        "message", e.getMessage(),
+                        "waitlisted", true
+                ));
+            }
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            // Catch-all for any other backend crashes so you get a clean error message instead of a silent 500
+            return ResponseEntity.badRequest().body(Map.of("message", "Server error: " + e.getMessage()));
         }
     }
 
     @DeleteMapping("/{id}/register")
     public ResponseEntity<?> cancel(@PathVariable Integer id,
-                                    @RequestBody Map<String, Integer> body) {
+                                    @RequestBody Map<String, Object> body) {
         try {
-            boolean cancelled = registrationService.cancelRegistration(body.get("userId"), id);
+            Integer userId = Integer.parseInt(body.get("userId").toString());
+            boolean cancelled = registrationService.cancelRegistration(userId, id);
             return cancelled
                     ? ResponseEntity.ok(Map.of("message", "Registration cancelled"))
                     : ResponseEntity.badRequest().body(Map.of("message", "Registration not found"));
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}/waitlist")
+    public ResponseEntity<?> leaveWaitlist(@PathVariable Integer id,
+                                           @RequestBody Map<String, Object> body) {
+        try {
+            Integer userId = Integer.parseInt(body.get("userId").toString());
+            registrationService.leaveWaitlist(userId, id);
+            return ResponseEntity.ok(Map.of("message", "Removed from waitlist"));
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
@@ -53,11 +93,14 @@ public class RegistrationController {
         return ResponseEntity.ok(registrationService.getWaitlist(id));
     }
 
-    // ✅ Clean endpoint to check registration status — used by frontend
     @GetMapping("/{id}/status")
     public ResponseEntity<?> getStatus(@PathVariable Integer id,
                                        @RequestParam Integer userId) {
         boolean registered = registrationService.isRegistered(userId, id);
-        return ResponseEntity.ok(Map.of("registered", registered));
+        Integer waitlistPos = registrationService.getWaitlistPosition(userId, id).orElse(null);
+        return ResponseEntity.ok(Map.of(
+                "registered", registered,
+                "waitlistPosition", waitlistPos != null ? waitlistPos : 0
+        ));
     }
 }
